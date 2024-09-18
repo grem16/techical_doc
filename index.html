@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" media="print" href="styles.css" />
+    <title>FastHTML Docs</title>
+  </head>
+  <body>
+    <main id="main-doc">
+      <nav id="navbar">
+        <header>
+          
+        </header>
+      </nav>
+      <section class="main-section" id="Get_Started">
+        <header>Get Started</header>
+        <article>
+          <p>Welcome to the official FastHTML documentation.</p>
+          <p>
+            FastHTML is a new next-generation web framework for fast, scalable
+            web applications with minimal, compact code. It’s designed to be:
+          </p>
+          <ul>
+            <li>
+              Powerful and expressive enough to build the most advanced,
+              interactive web apps you can imagine.
+            </li>
+            <li>
+              Fast and lightweight, so you can write less code and get more
+              done.
+            </li>
+            <li>
+              Easy to learn and use, with a simple, intuitive syntax that makes
+              it easy to build complex apps quickly.
+            </li>
+          </ul>
+        </article>
+      </section>
+      <section class="main-section" id="FastHTML_Basics">
+        <header>FastHTML Basics</header>
+        <article>
+          <p>
+            FastHTML is just Python. You can install it with pip install
+            python-fasthtml. Extensions/components built for it can likewise be
+            distributed via PyPI or as simple Python files.
+          </p>
+          <p>
+            The core usage of FastHTML is to define routes, and then to define
+            what to do at each route. This is similar to the FastAPI web
+            framework (in fact we implemented much of the functionality to match
+            the FastAPI usage examples), but where FastAPI focuses on returning
+            JSON data to build APIs, FastHTML focuses on returning HTML data.
+          </p>
+          <p>
+            Here’s a simple FastHTML app that returns a “Hello, World” message:
+          </p>
+          <pre>
+            <code>
+    from fasthtml.common import FastHTML, serve
+
+    app = FastHTML()
+
+    @app.get("/")
+    def home():
+    return "&lt;h1&gt;Hola Mundo&lt;/h1&gt;"
+
+    serve()
+              </code>
+          </pre>
+        </article>
+      </section>
+      <section class="main-section" id="Constructing_HTML">
+        <header>Constructing HTML</header>
+        <article>
+          <p>
+            Notice we wrote some HTML in the previous example. We don’t want to
+            do that! Some web frameworks require that you learn HTML, CSS,
+            JavaScript AND some templating language AND python. We want to do as
+            much as possible with just one language. Fortunately, the Python
+            module fastcore.xml has all we need for constructing HTML from
+            Python, and FastHTML includes all the tags you need to get started.
+            For example:
+          </p>
+          <pre><code>
+    from fasthtml.common import *
+    page = Html(
+    Head(Title('Some page')),
+    Body(Div('Some text, ', A('A link', href='https://example.com'), Img(src="https://placehold.co/200"), cls='myclass')))
+    print(to_xml(page))
+          </code></pre>
+          <p>
+            FastHTML is smart enough to know about fastcore.xml, and so you
+            don’t need to use the to_xml function to convert your FT objects to
+            HTML. You can just return them as you would any other Python object.
+            For example, if we modify our previous example to use fastcore.xml,
+            we can return an FT object directly:
+          </p>
+          <pre>
+            <code>
+    from fasthtml.common import *
+    app = FastHTML()
+
+    @app.get("/")
+    def home():
+        page = Html(
+            Head(Title('Some page')),
+            Body(Div('Some text, ', A('A link', href='https://example.com'), Img(src="https://placehold.co/200"), cls='myclass')))
+        return page
+
+    serve()
+            </code>
+          </pre>
+        </article>
+      </section>
+      <section class="main-section" id="Defining_Routes">
+        <header>Defining Routes</header>
+        <article>
+          <p>
+            The HTTP protocol defines a number of methods (‘verbs’) to send
+            requests to a server. The most common are GET, POST, PUT, DELETE,
+            and HEAD. We saw ‘GET’ in action before - when you navigate to a
+            URL, you’re making a GET request to that URL. We can do different
+            things on a route for different HTTP methods. For example:
+          </p>
+          <pre>
+            <code>
+    @app.route("/", methods='get')
+    def home():
+        return H1('Hello, World')
+
+    @app.route("/", methods=['post', 'put'])
+    def post_or_put():
+        return "got a POST or PUT request"
+            </code>
+          </pre>
+          <p>
+            This says that when someone navigates to the root URL “/” (i.e.
+            sends a GET request), they will see the big “Hello, World” heading.
+            When someone submits a POST or PUT request to the same URL, the
+            server should return the string “got a post or put request”.
+          </p>
+        </article>
+      </section>
+      <section class="main-section" id="Styling_Basics">
+        <header>Styling Basics</header>
+        <article>
+          <p>
+            Plain HTML probably isn’t quite what you imagine when you visualize
+            your beautiful web app. CSS is the go-to language for styling HTML.
+            But again, we don’t want to learn extra languages unless we
+            absolutely have to! Fortunately, there are ways to get much more
+            visually appealing sites by relying on the hard work of others,
+            using existing CSS libraries. One of our favourites is PicoCSS. A
+            common way to add CSS files to web pages is to use a &lt;link /&gt;
+            tag inside your HTML header, like this:
+          </p>
+          <pre>
+            <code>
+    &lt;header&gt;
+        ...
+        &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@latest/css/pico.min.css"&gt;
+    &lt;/header&gt;
+            </code>
+          </pre>
+          <p>
+            Since we typically want CSS styling on all pages of our app,
+            FastHTML lets you define a shared HTML header with the hdrs argument
+            as shown below:
+          </p>
+          <pre>
+            <code>
+    from fasthtml.common import *
+    css = Style(':root {--pico-font-size:90%,--pico-font-family: Pacifico, cursive;}')
+    app = FastHTML(hdrs=(picolink, css))
+
+    @app.route("/")
+    def get():
+        return (Title("Hello World"), 
+            Main(H1('Hello, World'), cls="container"))
+            </code>
+          </pre>
+        </article>
+      </section>
+      <section class="main-section" id="Web_Page_to_Web_App">
+        <header>Web Page to Web App</header>
+        <article>
+          <p>
+            Showing content is all well and good, but we typically expect a bit
+            more interactivity from something calling itself a web app! So,
+            let’s add a few different pages, and use a form to let users add
+            messages to a list:
+          </p>
+          <pre>
+            <code>
+    app = FastHTML()
+    messages = ["This is a message, which will get rendered as a paragraph"]
+    
+    @app.get("/")
+    def home():
+        return Main(H1('Messages'), 
+                    *[P(msg) for msg in messages],
+                    A("Link to Page 2 (to add messages)", href="/page2"))
+    
+    @app.get("/page2")
+    def page2():
+        return Main(P("Add a message with the form below:"),
+                    Form(Input(type="text", name="data"),
+                            Button("Submit"),
+                            action="/", method="post"))
+    
+    @app.post("/")
+    def add_message(data:str):
+        messages.append(data)
+        return home()                
+            </code>
+          </pre>
+          <p>
+            We re-render the entire homepage to show the newly added message.
+            This is fine, but modern web apps often don’t re-render the entire
+            page, they just update a part of the page. In fact even very
+            complicated applications are often implemented as ‘Single Page Apps’
+            (SPAs). This is where HTMX comes in.
+          </p>
+        </article>
+      </section>
+      <section class="main-section" id="HTMX">
+        <header>HTMX</header>
+        <article>
+          <p>
+            HTMX addresses some key limitations of HTML. In vanilla HTML, links
+            can trigger a GET request to show a new page, and forms can send
+            requests containing data to the server. A lot of ‘Web 1.0’ design
+            revolved around ways to use these to do everything we wanted. But
+            why should only some elements be allowed to trigger requests? And
+            why should we refresh the entire page with the result each time one
+            does? HTMX extends HTML to allow us to trigger requests from any
+            element on all kinds of events, and to update a part of the page
+            without refreshing the entire page. It’s a powerful tool for
+            building modern web apps.
+          </p>
+          <p>
+            It does this by adding attributes to HTML tags to make them do
+            things. For example, here’s a page with a counter and a button that
+            increments it:
+          </p>
+          <pre>
+            <code>
+    app = FastHTML()
+
+    count = 0
+
+    @app.get("/")
+    def home():
+        return Title("Count Demo"), Main(
+            H1("Count Demo"),
+            P(f"Count is set to {count}", id="count"),
+            Button("Increment", hx_post="/increment", hx_target="#count", hx_swap="innerHTML")
+        )
+
+    @app.post("/increment")
+    def increment():
+        print("incrementing")
+        global count
+        count += 1
+        return f"Count is set to {count}"
+            </code>
+          </pre>
+          <p>
+            The button triggers a POST request to /increment (since we set
+            hx_post="/increment"), which increments the count and returns the
+            new count. The hx_target attribute tells HTMX where to put the
+            result. If no target is specified it replaces the element that
+            triggered the request. The hx_swap attribute specifies how it adds
+            the result to the page. Useful options are:
+          </p>
+          <ul>
+            <li>
+              innerHTML: Replace the target element’s content with the result.
+            </li>
+            <li>outerHTML: Replace the target element with the result.</li>
+            <li>beforebegin: Insert the result before the target element.</li>
+            <li>
+              beforeend: Insert the result inside the target element, after its
+              last child.
+            </li>
+            <li>
+              afterbegin: Insert the result inside the target element, before
+              its first child.
+            </li>
+            <li>afterend: Insert the result after the target element.</li>
+          </ul>
+        </article>
+      </section>
+      <section class="main-section" id="Replacing_Elements">
+        <header>Replacing Elements</header>
+        <article>
+          <p>
+            Sometimes having a single target is not enough, and we’d like to
+            specify some additional elements to update or remove. In these
+            cases, returning elements with an id that matches the element to be
+            replaced and hx_swap_oob='true' will replace those elements too.
+            We’ll use this in the next example to clear an input field when we
+            submit a form.
+          </p>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
